@@ -1,8 +1,8 @@
 import random
 import os
 from PIL import Image, ImageDraw
-from rule1test import rule1, SPECIFIC_SEED
 
+from rule1 import rule1, SPECIFIC_SEED
 from rule2 import rule2, SPECIFIC_SEED
 from rule3 import rule3, SPECIFIC_SEED
 from rule4 import rule4, SPECIFIC_SEED
@@ -10,16 +10,15 @@ from rule5 import rule5, SPECIFIC_SEED
 from rule6 import rule6, SPECIFIC_SEED
 from rule7 import rule7, SPECIFIC_SEED
 
-
-
 # Set the output directory
 OUTPUT_DIRECTORY = "output"
 if not os.path.exists(OUTPUT_DIRECTORY):
     os.makedirs(OUTPUT_DIRECTORY)
 
 # Define flags and parameters for the frame
-CREATE_FRAME = False
+CREATE_FRAME = True
 FRAME_THICKNESS = 8  # Thickness of the frame in pixels
+FRAME_COLOR = (255, 255, 255)  # Color of the frame (black)
 
 def create_background_canvas(width=128, height=128, background_color='white'):
     total_width = width
@@ -66,10 +65,10 @@ for i in range(3):
     if CREATE_FRAME:
         draw = ImageDraw.Draw(canvas)
         for j in range(FRAME_THICKNESS):
-            draw.rectangle([j, j, canvas.size[0] - 1 - j, canvas.size[1] - 1 - j], outline='white')
+            draw.rectangle([j, j, canvas.size[0] - 1 - j, canvas.size[1] - 1 - j], outline=FRAME_COLOR)
     
     # Resize the canvas
-    scale_factor = round(1980 / img_width)
+    scale_factor = round(1024*4 / img_width)
     canvas = canvas.resize((canvas.width * scale_factor, canvas.height * scale_factor), resample=Image.NEAREST)
     rule_index = rules.index(rule_function) + 1
     filename = f"{seed}_{img_width}x{img_height}_{rule_index}.png"

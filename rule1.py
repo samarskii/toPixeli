@@ -1,5 +1,6 @@
 import random
 from PIL import Image
+from colors4 import pastel_colors_4, vintage_colors_4, retro_colors_4, neon_colors_4, gold_colors_4, light_colors_4   # Correct import statement
 
 # Define specific colors
 SPECIFIC_COLORS = [
@@ -10,6 +11,7 @@ SPECIFIC_COLORS = [
     (0, 0, 0)         # Black for border
 ]
 
+# Flags and parameters
 USE_SPECIFIC_COLORS = False  # Change this flag to switch between specific and random colors
 USE_RANDOM_AMOUNT = True  # Change this flag to switch between random and specific amount
 PARTICULAR_AMOUNT = 40  # Set a particular amount if USE_RANDOM_AMOUNT is False
@@ -21,9 +23,18 @@ SPECIFIC_SEED = None  # Set a specific seed value for reproducibility, e.g., 42
 
 BORDER_THICKNESS = 0  # Thickness of the colored border in pixels
 
+FROM_COLORS = True  # Flag to use colors from the predefined color lists
+COLOR_LIST_NAME = gold_colors_4  # Set the specific color list name if needed
+
 def get_colors():
     if USE_SPECIFIC_COLORS:
         return SPECIFIC_COLORS
+    elif FROM_COLORS:
+        if COLOR_LIST_NAME:
+            color_list = COLOR_LIST_NAME
+        else:
+            color_list = random.choice(all_colors_lists)
+        return [tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) for color in random.choice(color_list)]
     else:
         return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(5)]
 
@@ -179,7 +190,7 @@ def rule1(canvas):
 
     # Draw border with the fifth color if BORDER_THICKNESS is greater than 0
     if BORDER_THICKNESS > 0:
-        border_color = colors[3]
+        border_color = (0, 0, 0) # Black border color
         for t in range(BORDER_THICKNESS):
             for x in range(canvas.size[0]):
                 canvas.putpixel((x, t), border_color)
