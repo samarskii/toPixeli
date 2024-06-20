@@ -6,7 +6,8 @@ SPECIFIC_COLORS = [
     (255, 255, 0),    # Yellow
     (255, 165, 0),    # Orange
     (206, 70, 118),   # Pink
-    (0, 128, 0)       # Green
+    (0, 128, 0),      # Green
+    (0, 0, 0)         # Black for border
 ]
 
 USE_SPECIFIC_COLORS = False  # Change this flag to switch between specific and random colors
@@ -18,11 +19,13 @@ SPECIFIC_SUBRULE = 'ABOVE'   # Set the specific subrule to be used if USE_SPECIF
 
 SPECIFIC_SEED = None  # Set a specific seed value for reproducibility, e.g., 42
 
+BORDER_THICKNESS = 0  # Thickness of the colored border in pixels
+
 def get_colors():
     if USE_SPECIFIC_COLORS:
         return SPECIFIC_COLORS
     else:
-        return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(4)]
+        return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(5)]
 
 def get_amount_of_first_color(canvas):
     if USE_RANDOM_AMOUNT:
@@ -173,3 +176,14 @@ def rule1(canvas):
                     
     except KeyboardInterrupt:
         print("Program interrupted by the user.")
+
+    # Draw border with the fifth color if BORDER_THICKNESS is greater than 0
+    if BORDER_THICKNESS > 0:
+        border_color = colors[3]
+        for t in range(BORDER_THICKNESS):
+            for x in range(canvas.size[0]):
+                canvas.putpixel((x, t), border_color)
+                canvas.putpixel((x, canvas.size[1] - 1 - t), border_color)
+            for y in range(canvas.size[1]):
+                canvas.putpixel((t, y), border_color)
+                canvas.putpixel((canvas.size[0] - 1 - t, y), border_color)

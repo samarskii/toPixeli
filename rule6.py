@@ -15,9 +15,6 @@ USE_SPECIFIC_COLORS = False  # Flag to switch between specific and random colors
 USE_RANDOM_AMOUNT = True  # Flag to switch between random and specific amount of first color
 PARTICULAR_AMOUNT = 50  # Specific amount to use if USE_RANDOM_AMOUNT is False
 
-USE_SPECIFIC_SUBRULE = False  # Flag to use a specific subrule
-SPECIFIC_SUBRULE = 'DIAGONAL_UP_RIGHT'  # Specific subrule to use if USE_SPECIFIC_SUBRULE is True
-
 SPECIFIC_SEED = None  # Specific seed value for reproducibility, e.g., 42
 
 BORDER_THICKNESS = 1  # Thickness of the colored border in pixels
@@ -27,7 +24,7 @@ def get_colors():
     if USE_SPECIFIC_COLORS:
         return SPECIFIC_COLORS
     else:
-        return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(5)]
+        return [(random.randint(0, 1) * 255, random.randint(0, 1) * 255, random.randint(0, 1) * 255) for _ in range(5)]
 
 def get_amount_of_first_color(canvas):
     """Determine the amount of the first color to use. Use a random amount if USE_RANDOM_AMOUNT is True, otherwise use PARTICULAR_AMOUNT."""
@@ -36,8 +33,8 @@ def get_amount_of_first_color(canvas):
     else:
         return PARTICULAR_AMOUNT
 
-def rule2(canvas):
-    """Apply the rule2 pattern to the given canvas."""
+def rule6(canvas):
+    """Apply the rule6 pattern to the given canvas."""
     if SPECIFIC_SEED is not None:
         random.seed(SPECIFIC_SEED)
         
@@ -53,16 +50,11 @@ def rule2(canvas):
     max_attempts = canvas.size[0] * canvas.size[1] * 10  # Safeguard to prevent infinite loops
     attempts = 0
     
-    # Place the first color randomly on the canvas, ensuring no direct adjacency
+    # Place the first color randomly on the canvas
     while len(first_positions) < amount_of_first_color and attempts < max_attempts:
         x, y = random.randint(0, canvas.size[0] - 1), random.randint(0, canvas.size[1] - 1)
-        if (x, y) not in first_positions and \
-           (x-1, y) not in first_positions and \
-           (x+1, y) not in first_positions and \
-           (x, y-1) not in first_positions and \
-           (x, y+1) not in first_positions:
-            first_positions.add((x, y))
-            canvas.putpixel((x, y), first_color)
+        first_positions.add((x, y))
+        canvas.putpixel((x, y), first_color)
         attempts += 1
 
     if attempts == max_attempts:
@@ -71,29 +63,69 @@ def rule2(canvas):
     list_of_first_positions = list(first_positions)
 
     # Define subrules for how the pattern should expand
-    subrules = ["DIAGONAL_UP_RIGHT", "DIAGONAL_UP_LEFT", "DIAGONAL_DOWN_RIGHT", "DIAGONAL_DOWN_LEFT"]
-    chosen_subrule = SPECIFIC_SUBRULE if USE_SPECIFIC_SUBRULE else random.choice(subrules)
+    submodes = ["DIAGONAL_UP_RIGHT", "DIAGONAL_UP_LEFT", "DIAGONAL_DOWN_RIGHT", "DIAGONAL_DOWN_LEFT", "CROSS", "SQUARE"]
+    chosen_submode = random.choice(submodes)
 
-    # Apply the chosen subrule to expand the pattern with the second color
-    list_of_second_positions = set()
-    for pos in list_of_first_positions:
-        x, y = pos
-        num_steps = random.randint(1, 3)
-        for step in range(1, num_steps + 1):
-            if chosen_subrule == 'DIAGONAL_UP_RIGHT':
-                diagonal_pos = (x + step, y - step)
-            elif chosen_subrule == 'DIAGONAL_UP_LEFT':
-                diagonal_pos = (x - step, y - step)
-            elif chosen_subrule == 'DIAGONAL_DOWN_RIGHT':
-                diagonal_pos = (x + step, y + step)
-            elif chosen_subrule == 'DIAGONAL_DOWN_LEFT':
-                diagonal_pos = (x - step, y + step)
-            if 0 <= diagonal_pos[0] < canvas.size[0] and 0 <= diagonal_pos[1] < canvas.size[1]:
+    # Apply the chosen submode to expand the pattern with the second color
+    list_of_second_positions = list()
+    if chosen_submode == "DIAGONAL_UP_RIGHT":
+        for pos in list_of_first_positions:
+            x, y = pos
+            if x < canvas.size[0] - 1 and y > 0:
+                diagonal_pos = (x + 1, y - 1)
                 if diagonal_pos not in first_positions:
-                    list_of_second_positions.add(diagonal_pos)
+                    list_of_second_positions.append(diagonal_pos)
+
+    elif chosen_submode == "DIAGONAL_UP_LEFT":
+        for pos in list_of_first_positions:
+            x, y = pos
+            if x > 0 and y > 0:
+                diagonal_pos = (x - 1, y - 1)
+                if diagonal_pos not in first_positions:
+                    list_of_second_positions.append(diagonal_pos)
+
+    elif chosen_submode == "DIAGONAL_DOWN_RIGHT":
+        for pos in list_of_first_positions:
+            x, y = pos
+            if x < canvas.size[0] - 1 and y < canvas.size[1] - 1:
+                diagonal_pos = (x + 1, y + 1)
+                if diagonal_pos not in first_positions:
+                    list_of_second_positions.append(diagonal_pos)
+
+    elif chosen_submode == "DIAGONAL_DOWN_LEFT":
+        for pos in list_of_first_positions:
+            x, y = pos
+            if x > 0 and y < canvas.size[1] - 1:
+                diagonal_pos = (x - 1, y + 1)
+                if diagonal_pos not in first_positions:
+                    list_of_second_positions.append(diagonal_pos)
+
+    elif chosen_submode == "CROSS":
+        for pos in list_of_first_positions:
+            x, y = pos
+            cross_positions = [(x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y)]
+            for cross_pos in cross_positions:
+                if (0 <= cross_pos[0] < canvas.size[0] and
+                        0 <= cross_pos[1] < canvas.size[1] and
+                        cross_pos not in first_positions):
+                    list_of_second_positions.append(cross_pos)
+
+    elif chosen_submode == "SQUARE":
+        for pos in list_of_first_positions:
+            x, y = pos
+            square_positions = [
+                (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
+                (x - 1, y), (x + 1, y),
+                (x - 1, y + 1), (x, y + 1), (x + 1, y + 1)
+            ]
+            for square_pos in square_positions:
+                if (0 <= square_pos[0] < canvas.size[0] and
+                        0 <= square_pos[1] < canvas.size[1] and
+                        square_pos not in first_positions):
+                    list_of_second_positions.append(square_pos)
 
     for pos in list_of_second_positions:
-        canvas.putpixel(pos, second_color)
+                canvas.putpixel(pos, second_color)
 
     # Add noise with the third color, ensuring no overlap with the first or second colors
     noise_positions = set()
@@ -123,4 +155,3 @@ def rule2(canvas):
         for y in range(canvas.size[1]):
             canvas.putpixel((t, y), border_color)
             canvas.putpixel((canvas.size[0] - 1 - t, y), border_color)
-

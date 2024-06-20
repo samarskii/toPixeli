@@ -1,4 +1,5 @@
 import random
+import math
 from PIL import Image
 
 # Define specific colors for use when USE_SPECIFIC_COLORS is True
@@ -16,7 +17,7 @@ USE_RANDOM_AMOUNT = True  # Flag to switch between random and specific amount of
 PARTICULAR_AMOUNT = 50  # Specific amount to use if USE_RANDOM_AMOUNT is False
 
 USE_SPECIFIC_SUBRULE = False  # Flag to use a specific subrule
-SPECIFIC_SUBRULE = 'DIAGONAL_UP_RIGHT'  # Specific subrule to use if USE_SPECIFIC_SUBRULE is True
+SPECIFIC_SUBRULE = 'EXPLOSION'  # Specific subrule to use if USE_SPECIFIC_SUBRULE is True
 
 SPECIFIC_SEED = None  # Specific seed value for reproducibility, e.g., 42
 
@@ -32,12 +33,12 @@ def get_colors():
 def get_amount_of_first_color(canvas):
     """Determine the amount of the first color to use. Use a random amount if USE_RANDOM_AMOUNT is True, otherwise use PARTICULAR_AMOUNT."""
     if USE_RANDOM_AMOUNT:
-        return round((canvas.size[0] * canvas.size[1]) / random.randint(5, 8) * random.randint(1, 2))
+        return round((canvas.size[0] * canvas.size[1]) / random.randint(3, 5) * random.randint(1, 2))
     else:
         return PARTICULAR_AMOUNT
 
-def rule2(canvas):
-    """Apply the rule2 pattern to the given canvas."""
+def rule4(canvas):
+    """Apply the rule4 pattern to the given canvas."""
     if SPECIFIC_SEED is not None:
         random.seed(SPECIFIC_SEED)
         
@@ -53,16 +54,11 @@ def rule2(canvas):
     max_attempts = canvas.size[0] * canvas.size[1] * 10  # Safeguard to prevent infinite loops
     attempts = 0
     
-    # Place the first color randomly on the canvas, ensuring no direct adjacency
+    # Place the first color randomly on the canvas
     while len(first_positions) < amount_of_first_color and attempts < max_attempts:
         x, y = random.randint(0, canvas.size[0] - 1), random.randint(0, canvas.size[1] - 1)
-        if (x, y) not in first_positions and \
-           (x-1, y) not in first_positions and \
-           (x+1, y) not in first_positions and \
-           (x, y-1) not in first_positions and \
-           (x, y+1) not in first_positions:
-            first_positions.add((x, y))
-            canvas.putpixel((x, y), first_color)
+        first_positions.add((x, y))
+        canvas.putpixel((x, y), first_color)
         attempts += 1
 
     if attempts == max_attempts:
@@ -71,29 +67,50 @@ def rule2(canvas):
     list_of_first_positions = list(first_positions)
 
     # Define subrules for how the pattern should expand
-    subrules = ["DIAGONAL_UP_RIGHT", "DIAGONAL_UP_LEFT", "DIAGONAL_DOWN_RIGHT", "DIAGONAL_DOWN_LEFT"]
+    subrules = ["EXPLOSION", "SPIRAL", "RIPPLE", "GALAXY"]
     chosen_subrule = SPECIFIC_SUBRULE if USE_SPECIFIC_SUBRULE else random.choice(subrules)
 
     # Apply the chosen subrule to expand the pattern with the second color
-    list_of_second_positions = set()
-    for pos in list_of_first_positions:
-        x, y = pos
-        num_steps = random.randint(1, 3)
-        for step in range(1, num_steps + 1):
-            if chosen_subrule == 'DIAGONAL_UP_RIGHT':
-                diagonal_pos = (x + step, y - step)
-            elif chosen_subrule == 'DIAGONAL_UP_LEFT':
-                diagonal_pos = (x - step, y - step)
-            elif chosen_subrule == 'DIAGONAL_DOWN_RIGHT':
-                diagonal_pos = (x + step, y + step)
-            elif chosen_subrule == 'DIAGONAL_DOWN_LEFT':
-                diagonal_pos = (x - step, y + step)
-            if 0 <= diagonal_pos[0] < canvas.size[0] and 0 <= diagonal_pos[1] < canvas.size[1]:
-                if diagonal_pos not in first_positions:
-                    list_of_second_positions.add(diagonal_pos)
+    list_of_second_positions = list()
+    if chosen_subrule == 'EXPLOSION':
+        for pos in list_of_first_positions:
+            x, y = pos
+            for i in range(1, random.randint(2, 5)):
+                explosion_pos = (x + random.randint(-i, i), y + random.randint(-i, i))
+                if (explosion_pos[0] >= 0 and explosion_pos[0] < canvas.size[0] and
+                        explosion_pos[1] >= 0 and explosion_pos[1] < canvas.size[1] and
+                        explosion_pos not in first_positions):
+                    list_of_second_positions.append(explosion_pos)
 
-    for pos in list_of_second_positions:
-        canvas.putpixel(pos, second_color)
+    if chosen_subrule == 'SPIRAL':
+        for pos in list_of_first_positions:
+            x, y = pos
+            for i in range(1, random.randint(2, 5)):
+                spiral_pos = (x + i * math.cos(i * math.pi / 4), y + i * math.sin(i * math.pi / 4))
+                if (0 <= spiral_pos[0] < canvas.size[0] and 0 <= spiral_pos[1] < canvas.size[1] and
+                        spiral_pos not in first_positions):
+                    list_of_second_positions.append(spiral_pos)
+
+    if chosen_subrule == 'RIPPLE':
+        for pos in list_of_first_positions:
+            x, y = pos
+            for i in range(1, random.randint(2, 5)):
+                ripple_pos = (x + i * math.cos(i * math.pi / 2), y + i * math.sin(i * math.pi / 2))
+                if (0 <= ripple_pos[0] < canvas.size[0] and 0 <= ripple_pos[1] < canvas.size[1] and
+                        ripple_pos not in first_positions):
+                    list_of_second_positions.append(ripple_pos)
+
+    if chosen_subrule == 'GALAXY':
+        for pos in list_of_first_positions:
+            x, y = pos
+            for i in range(1, random.randint(2, 5)):
+                galaxy_pos = (x + i * math.cos(i * math.pi / 3), y + i * math.sin(i * math.pi / 3))
+                if (0 <= galaxy_pos[0] < canvas.size[0] and 0 <= galaxy_pos[1] < canvas.size[1] and
+                        galaxy_pos not in first_positions):
+                    list_of_second_positions.append(galaxy_pos)
+
+    for i in list_of_second_positions:
+        canvas.putpixel((int(i[0]), int(i[1])), second_color)
 
     # Add noise with the third color, ensuring no overlap with the first or second colors
     noise_positions = set()
@@ -123,4 +140,3 @@ def rule2(canvas):
         for y in range(canvas.size[1]):
             canvas.putpixel((t, y), border_color)
             canvas.putpixel((canvas.size[0] - 1 - t, y), border_color)
-

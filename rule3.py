@@ -16,11 +16,11 @@ USE_RANDOM_AMOUNT = True  # Flag to switch between random and specific amount of
 PARTICULAR_AMOUNT = 50  # Specific amount to use if USE_RANDOM_AMOUNT is False
 
 USE_SPECIFIC_SUBRULE = False  # Flag to use a specific subrule
-SPECIFIC_SUBRULE = 'DIAGONAL_UP_RIGHT'  # Specific subrule to use if USE_SPECIFIC_SUBRULE is True
+SPECIFIC_SUBRULE = 'DIAGONAL_UP_LEFT'  # Specific subrule to use if USE_SPECIFIC_SUBRULE is True
 
 SPECIFIC_SEED = None  # Specific seed value for reproducibility, e.g., 42
 
-BORDER_THICKNESS = 1  # Thickness of the colored border in pixels
+BORDER_THICKNESS = 0  # Thickness of the colored border in pixels
 
 def get_colors():
     """Generate a list of colors. Use specific colors if USE_SPECIFIC_COLORS is True, otherwise generate random colors."""
@@ -36,8 +36,8 @@ def get_amount_of_first_color(canvas):
     else:
         return PARTICULAR_AMOUNT
 
-def rule2(canvas):
-    """Apply the rule2 pattern to the given canvas."""
+def rule3(canvas):
+    """Apply the rule3 pattern to the given canvas."""
     if SPECIFIC_SEED is not None:
         random.seed(SPECIFIC_SEED)
         
@@ -71,7 +71,7 @@ def rule2(canvas):
     list_of_first_positions = list(first_positions)
 
     # Define subrules for how the pattern should expand
-    subrules = ["DIAGONAL_UP_RIGHT", "DIAGONAL_UP_LEFT", "DIAGONAL_DOWN_RIGHT", "DIAGONAL_DOWN_LEFT"]
+    subrules = ["DIAGONAL_UP_LEFT", "DIAGONAL_UP_RIGHT", "DIAGONAL_DOWN_LEFT", "DIAGONAL_DOWN_RIGHT"]
     chosen_subrule = SPECIFIC_SUBRULE if USE_SPECIFIC_SUBRULE else random.choice(subrules)
 
     # Apply the chosen subrule to expand the pattern with the second color
@@ -80,14 +80,14 @@ def rule2(canvas):
         x, y = pos
         num_steps = random.randint(1, 3)
         for step in range(1, num_steps + 1):
-            if chosen_subrule == 'DIAGONAL_UP_RIGHT':
-                diagonal_pos = (x + step, y - step)
-            elif chosen_subrule == 'DIAGONAL_UP_LEFT':
+            if chosen_subrule == 'DIAGONAL_UP_LEFT':
                 diagonal_pos = (x - step, y - step)
-            elif chosen_subrule == 'DIAGONAL_DOWN_RIGHT':
-                diagonal_pos = (x + step, y + step)
+            elif chosen_subrule == 'DIAGONAL_UP_RIGHT':
+                diagonal_pos = (x + step, y - step)
             elif chosen_subrule == 'DIAGONAL_DOWN_LEFT':
                 diagonal_pos = (x - step, y + step)
+            elif chosen_subrule == 'DIAGONAL_DOWN_RIGHT':
+                diagonal_pos = (x + step, y + step)
             if 0 <= diagonal_pos[0] < canvas.size[0] and 0 <= diagonal_pos[1] < canvas.size[1]:
                 if diagonal_pos not in first_positions:
                     list_of_second_positions.add(diagonal_pos)
@@ -123,4 +123,5 @@ def rule2(canvas):
         for y in range(canvas.size[1]):
             canvas.putpixel((t, y), border_color)
             canvas.putpixel((canvas.size[0] - 1 - t, y), border_color)
+
 

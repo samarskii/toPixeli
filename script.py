@@ -1,8 +1,16 @@
 import random
 import os
 from PIL import Image, ImageDraw
-from rule1 import rule1, SPECIFIC_SEED
+from rule1test import rule1, SPECIFIC_SEED
+
 from rule2 import rule2, SPECIFIC_SEED
+from rule3 import rule3, SPECIFIC_SEED
+from rule4 import rule4, SPECIFIC_SEED
+from rule5 import rule5, SPECIFIC_SEED
+from rule6 import rule6, SPECIFIC_SEED
+from rule7 import rule7, SPECIFIC_SEED
+
+
 
 # Set the output directory
 OUTPUT_DIRECTORY = "output"
@@ -10,7 +18,7 @@ if not os.path.exists(OUTPUT_DIRECTORY):
     os.makedirs(OUTPUT_DIRECTORY)
 
 # Define flags and parameters for the frame
-CREATE_FRAME = True
+CREATE_FRAME = False
 FRAME_THICKNESS = 8  # Thickness of the frame in pixels
 
 def create_background_canvas(width=128, height=128, background_color='white'):
@@ -24,16 +32,16 @@ def create_background_canvas(width=128, height=128, background_color='white'):
     
     return canvas
 
-rules = [rule2]
-width_height_options = [(16, 16)]
+rules = [rule1]
+width_height_options = [(32, 32)]
 
 # Generate images
-for i in range(5):
+for i in range(3):
     rule_function = random.choice(rules)
     size_option = random.choice(width_height_options)
     img_width = size_option[0]
     img_height = size_option[1]
-
+    
     # Set a specific seed if specified, else generate a new one
     if SPECIFIC_SEED is not None:
         seed = SPECIFIC_SEED
