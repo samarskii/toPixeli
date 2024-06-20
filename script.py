@@ -2,6 +2,7 @@ import random
 import os
 from PIL import Image, ImageDraw
 from rule1 import rule1, SPECIFIC_SEED
+from rule2 import rule2, SPECIFIC_SEED
 
 # Set the output directory
 OUTPUT_DIRECTORY = "output"
@@ -23,11 +24,11 @@ def create_background_canvas(width=128, height=128, background_color='white'):
     
     return canvas
 
-rules = [rule1]
+rules = [rule2]
 width_height_options = [(16, 16)]
 
 # Generate images
-for i in range(20):
+for i in range(5):
     rule_function = random.choice(rules)
     size_option = random.choice(width_height_options)
     img_width = size_option[0]
@@ -42,13 +43,24 @@ for i in range(20):
     random.seed(seed)
         
     canvas = create_background_canvas(img_width, img_height, 'white')
-    rule_function(canvas)
     
+    # Draw the main pattern on the inner area
+    inner_canvas = Image.new('RGB', (img_width, img_height), 'white')
+    rule_function(inner_canvas)
+    
+    # Add the inner_canvas to the main canvas at the correct position
+    if CREATE_FRAME:
+        canvas.paste(inner_canvas, (FRAME_THICKNESS, FRAME_THICKNESS))
+    else:
+        canvas = inner_canvas
+    
+    # Draw the frame if needed
     if CREATE_FRAME:
         draw = ImageDraw.Draw(canvas)
         for j in range(FRAME_THICKNESS):
             draw.rectangle([j, j, canvas.size[0] - 1 - j, canvas.size[1] - 1 - j], outline='white')
     
+    # Resize the canvas
     scale_factor = round(1980 / img_width)
     canvas = canvas.resize((canvas.width * scale_factor, canvas.height * scale_factor), resample=Image.NEAREST)
     rule_index = rules.index(rule_function) + 1
