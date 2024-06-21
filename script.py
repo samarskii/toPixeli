@@ -32,10 +32,10 @@ def create_background_canvas(width=128, height=128, background_color='white'):
     return canvas
 
 rules = [rule1]
-width_height_options = [(32, 32)]
+width_height_options = [(16, 16)]
 
 # Generate images
-for i in range(5):
+for i in range(3):
     rule_function = random.choice(rules)
     size_option = random.choice(width_height_options)
     img_width = size_option[0]
@@ -68,7 +68,7 @@ for i in range(5):
             draw.rectangle([j, j, canvas.size[0] - 1 - j, canvas.size[1] - 1 - j], outline=FRAME_COLOR)
     
     # Resize the canvas
-    scale_factor = round(1024*4 / img_width)
+    scale_factor = round(1024*2 / img_width)
     canvas = canvas.resize((canvas.width * scale_factor, canvas.height * scale_factor), resample=Image.NEAREST)
     rule_index = rules.index(rule_function) + 1
     filename = f"{seed}_{img_width}x{img_height}_{rule_index}.png"

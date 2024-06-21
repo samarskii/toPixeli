@@ -1,6 +1,8 @@
 import random
 from PIL import Image
 from colors.colors4 import pastel_colors_4, vintage_colors_4, retro_colors_4, neon_colors_4, gold_colors_4, light_colors_4   # Correct import statement
+from colors.palletgenerator import generate_palette
+
 
 # Define specific colors
 SPECIFIC_COLORS = [
@@ -26,9 +28,15 @@ BORDER_THICKNESS = 0  # Thickness of the colored border in pixels
 FROM_COLORS = True  # Flag to use colors from the predefined color lists
 COLOR_LIST_NAME = retro_colors_4  # Set the specific color list name if needed
 
+FROM_GENERATOR = False # New flag to use the pallet color generator
+PALETTE_TYPE = 'gradient'
+
+
 def get_colors():
     if USE_SPECIFIC_COLORS:
         return SPECIFIC_COLORS
+    elif FROM_GENERATOR:
+        return [int(color[1:], 16) for color in generate_palette(PALETTE_TYPE, 5)]
     elif FROM_COLORS:
         if COLOR_LIST_NAME:
             color_list = COLOR_LIST_NAME
