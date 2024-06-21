@@ -2,13 +2,13 @@ import random
 import os
 from PIL import Image, ImageDraw
 
-from rule1 import rule1, SPECIFIC_SEED
-from rule2 import rule2, SPECIFIC_SEED
-from rule3 import rule3, SPECIFIC_SEED
-from rule4 import rule4, SPECIFIC_SEED
-from rule5 import rule5, SPECIFIC_SEED
-from rule6 import rule6, SPECIFIC_SEED
-from rule7 import rule7, SPECIFIC_SEED
+from rules.rule1 import rule1, SPECIFIC_SEED
+from rules.rule2 import rule2, SPECIFIC_SEED
+from rules.rule3 import rule3, SPECIFIC_SEED
+from rules.rule4 import rule4, SPECIFIC_SEED
+from rules.rule5 import rule5, SPECIFIC_SEED
+from rules.rule6 import rule6, SPECIFIC_SEED
+from rules.rule7 import rule7, SPECIFIC_SEED
 
 # Set the output directory
 OUTPUT_DIRECTORY = "output"
@@ -35,7 +35,7 @@ rules = [rule1]
 width_height_options = [(32, 32)]
 
 # Generate images
-for i in range(3):
+for i in range(5):
     rule_function = random.choice(rules)
     size_option = random.choice(width_height_options)
     img_width = size_option[0]

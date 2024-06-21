@@ -1,6 +1,6 @@
 import random
 from PIL import Image
-from colors4 import pastel_colors_4, vintage_colors_4, retro_colors_4, neon_colors_4, gold_colors_4, light_colors_4   # Correct import statement
+from colors.colors4 import pastel_colors_4, vintage_colors_4, retro_colors_4, neon_colors_4, gold_colors_4, light_colors_4   # Correct import statement
 
 # Define specific colors
 SPECIFIC_COLORS = [
@@ -16,7 +16,7 @@ USE_SPECIFIC_COLORS = False  # Change this flag to switch between specific and r
 USE_RANDOM_AMOUNT = True  # Change this flag to switch between random and specific amount
 PARTICULAR_AMOUNT = 40  # Set a particular amount if USE_RANDOM_AMOUNT is False
 
-USE_SPECIFIC_SUBRULE = True  # Change this flag to use a specific subrule
+USE_SPECIFIC_SUBRULE = False  # Change this flag to use a specific subrule
 SPECIFIC_SUBRULE = 'ABOVE'   # Set the specific subrule to be used if USE_SPECIFIC_SUBRULE is True
 
 SPECIFIC_SEED = None  # Set a specific seed value for reproducibility, e.g., 42
@@ -24,7 +24,7 @@ SPECIFIC_SEED = None  # Set a specific seed value for reproducibility, e.g., 42
 BORDER_THICKNESS = 0  # Thickness of the colored border in pixels
 
 FROM_COLORS = True  # Flag to use colors from the predefined color lists
-COLOR_LIST_NAME = gold_colors_4  # Set the specific color list name if needed
+COLOR_LIST_NAME = retro_colors_4  # Set the specific color list name if needed
 
 def get_colors():
     if USE_SPECIFIC_COLORS:
