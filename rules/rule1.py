@@ -1,9 +1,22 @@
 import random
 from PIL import Image
-from colors.colors4 import pastel_colors_4, vintage_colors_4, retro_colors_4, neon_colors_4, gold_colors_4, light_colors_4   # Correct import statement
+# from colors.colors4 import pastel_colors_4, vintage_colors_4, retro_colors_4, neon_colors_4, gold_colors_4, light_colors_4, dark_colors_4, warm_colors_4, cold_colors_4, summer_colors_4, fall_colors_4, winter_colors_4, spring_colors_4, happy_colors_4, nature_colors_4, earth_colors_4, night_colors_4, space_colors_4, rainbow_colors_4, gradient_color_4, sunset_colors_4, sky_colors_4, sea_colors_4 
+from colors.colors4 import pastel_colors_4, vintage_colors_4, retro_colors_4, neon_colors_4, gold_colors_4, light_colors_4, dark_colors_4, warm_colors_4, cold_colors_4, summer_colors_4, fall_colors_4, winter_colors_4, spring_colors_4, happy_colors_4, nature_colors_4
+
 from colors.palletgenerator import generate_palette
 
+# Flags and parameters
+SPECIFIC_SEED = None  # Set a specific seed value for reproducibility, e.g., 42
 
+BORDER_THICKNESS = 0  # Thickness of the colored border in pixels
+
+USE_RANDOM_AMOUNT = True  # Change this flag to switch between random and specific amount for first color
+PARTICULAR_AMOUNT = 40  # Set a particular amount if USE_RANDOM_AMOUNT is False
+
+USE_SPECIFIC_SUBRULE = True  # Change this flag to use a specific subrule
+SPECIFIC_SUBRULE = 'ABOVE'   # Set the specific subrule to be used if USE_SPECIFIC_SUBRULE is True
+
+USE_SPECIFIC_COLORS = False  # Change this flag to switch between specific and random colors
 # Define specific colors
 SPECIFIC_COLORS = [
     (255, 255, 0),    # Yellow
@@ -13,23 +26,19 @@ SPECIFIC_COLORS = [
     (0, 0, 0)         # Black for border
 ]
 
-# Flags and parameters
-USE_SPECIFIC_COLORS = False  # Change this flag to switch between specific and random colors
-USE_RANDOM_AMOUNT = True  # Change this flag to switch between random and specific amount
-PARTICULAR_AMOUNT = 40  # Set a particular amount if USE_RANDOM_AMOUNT is False
-
-USE_SPECIFIC_SUBRULE = False  # Change this flag to use a specific subrule
-SPECIFIC_SUBRULE = 'ABOVE'   # Set the specific subrule to be used if USE_SPECIFIC_SUBRULE is True
-
-SPECIFIC_SEED = None  # Set a specific seed value for reproducibility, e.g., 42
-
-BORDER_THICKNESS = 0  # Thickness of the colored border in pixels
-
+# pastel_colors_4, vintage_colors_4, retro_colors_4, neon_colors_4, gold_colors_4, 
+# light_colors_4, dark_colors_4, warm_colors_4, cold_colors_4, summer_colors_4, 
+# fall_colors_4, winter_colors_4, spring_colors_4, happy_colors_4, nature_colors_4, 
+# earth_colors_4, night_colors_4, space_colors_4, rainbow_colors_4, gradient_color_4, 
+# sunset_colors_4, sky_colors_4, sea_colors_4 
 FROM_COLORS = True  # Flag to use colors from the predefined color lists
 COLOR_LIST_NAME = retro_colors_4  # Set the specific color list name if needed
 
+# 'acidic', 'pastel', 'vibrant', 'earthy', 'monochromatic', 
+# 'psychedelic', 'dark', 'acidic-vibrant', 'gradient', 'neon', 
+# 'uv-reactive', 'acid-house', 'trance', 'goa-trance', 'synthwave'
 FROM_GENERATOR = False # New flag to use the pallet color generator
-PALETTE_TYPE = 'gradient'
+PALETTE_TYPE = 'vibrant'
 
 
 def get_colors():
@@ -41,8 +50,11 @@ def get_colors():
         if COLOR_LIST_NAME:
             color_list = COLOR_LIST_NAME
         else:
-            color_list = random.choice(all_colors_lists)
-        return [tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) for color in random.choice(color_list)]
+            color_list = random.choice([pastel_colors_4, vintage_colors_4, retro_colors_4, neon_colors_4, gold_colors_4, light_colors_4, dark_colors_4, warm_colors_4, cold_colors_4, summer_colors_4, fall_colors_4, winter_colors_4, spring_colors_4, happy_colors_4, nature_colors_4])
+        chosen_palette = random.choice(color_list)
+        colors = [tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) for color in chosen_palette]
+        border_color = tuple(int(random.choice(random.choice(color_list)).lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+        return colors + [border_color]
     else:
         return [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(5)]
 
@@ -57,7 +69,7 @@ def rule1(canvas):
         random.seed(SPECIFIC_SEED)
         
     colors = get_colors()
-    first_color, *colors = colors
+    first_color, *colors, border_color = colors
 
     amount_of_first_color = get_amount_of_first_color(canvas)
     first_positions = set()
@@ -198,7 +210,6 @@ def rule1(canvas):
 
     # Draw border with the fifth color if BORDER_THICKNESS is greater than 0
     if BORDER_THICKNESS > 0:
-        border_color = (0, 0, 0) # Black border color
         for t in range(BORDER_THICKNESS):
             for x in range(canvas.size[0]):
                 canvas.putpixel((x, t), border_color)
